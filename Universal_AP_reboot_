@@ -37,7 +37,7 @@ for host in All_WiFi:
         print(host + " reboot send (use exempt, most likely the point of version 4.3)")
         my_logger = logging.getLogger('MyLogger')
         my_logger.setLevel(logging.DEBUG)
-        handler = logging.handlers.SysLogHandler(address = ('192.168.1.1',514))
+        handler = logging.handlers.SysLogHandler(address = ('192.168.1.90',514))
         my_logger.addHandler(handler)
         my_logger.debug(host + " reboot send (use exempt)")
         pass
