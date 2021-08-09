@@ -1,0 +1,50 @@
+import paramiko 
+import time
+import logging
+import logging.handlers
+
+user = 'admin'
+pass1 = 'XXXXXXXX'
+port = 22
+
+
+Site1 = ['192.168.1.2', '192.168.1.3']
+Site2 = ['192.168.1.4', '192.168.1.5']
+All_WiFi = Site1 + Site2
+
+for host in All_WiFi:
+    try:
+        client = paramiko.SSHClient()
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        client.connect(hostname=host, username=user, password=pass1, port=port)
+        chan = client.invoke_shell()
+        time.sleep(2)
+        chan.send("reboot\n")
+        time.sleep(2)
+        chan.send("\n")
+        time.sleep(4)
+        output = chan.recv(99999)
+        my_logger = logging.getLogger('MyLogger')
+        my_logger.setLevel(logging.DEBUG)
+        handler = logging.handlers.SysLogHandler(address = ('192.168.1.90',514))
+        my_logger.addHandler(handler)
+        my_logger.debug(host + " reboot send")
+        print (host + " reboot send")
+        print (output)
+        client.close()
+    except:
+#use except - most likely the point of version 4.3 and becomes unavailable immediately after the reboot command
+        print(host + " reboot send (use exempt, most likely the point of version 4.3)")
+        my_logger = logging.getLogger('MyLogger')
+        my_logger.setLevel(logging.DEBUG)
+        handler = logging.handlers.SysLogHandler(address = ('192.168.99.1',514))
+        my_logger.addHandler(handler)
+        my_logger.debug(host + " reboot send (use exempt)")
+        pass
+    finally:
+        my_logger = logging.getLogger('MyLogger')
+        my_logger.setLevel(logging.DEBUG)
+        handler = logging.handlers.SysLogHandler(address = ('192.168.99.90',514))
+        my_logger.addHandler(handler)
+        if (my_logger.hasHandlers()):
+            my_logger.handlers.clear()
